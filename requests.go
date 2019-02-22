@@ -29,7 +29,6 @@ type DeezerAlbum struct {
 			Picture string `json:"picture"`
 		} `json:"data"`
 	} `json:"genres"`
-	NbTracks int    `json:"nb_tracks"`
 	Released string `json:"release_date"`
 	Artist struct {
 		Name string `json:"name"`

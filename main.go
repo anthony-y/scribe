@@ -3,10 +3,14 @@ package main
 import (
 	"net/http"
 	"path/filepath"
+	"io/ioutil"
 	"os"
 	"fmt"
 	"strconv"
 	"time"
+	"log"
+
+	"github.com/bogem/id3v2"
 )
 
 func main() {
@@ -41,6 +45,50 @@ func main() {
 	for i, track := range album.Tracks.Data {
 		fmt.Println(strconv.Itoa(i) + ". " + track.Title)
 	}
+
+	err = writeTags(album)
+	if err != nil {
+		return
+	}
+}
+
+func writeTags(album DeezerAlbum) error {
+	albumDir, err := ioutil.ReadDir(os.Args[1])
+	if err != nil {
+		log.Fatal(err)
+		return err
+	}
+
+	for i, file := range albumDir {
+		if file.IsDir() {
+			continue
+		}
+
+		fileName := filepath.Join(os.Args[1], file.Name())
+		fmt.Println(fileName)
+
+		mp3, err := id3v2.Open(fileName, id3v2.Options{
+			Parse: false,
+		})
+		defer mp3.Close()
+
+		if err != nil {
+			log.Fatal(err)
+			return err
+		}
+
+		trackName := album.Tracks.Data[i].Title
+
+		mp3.SetTitle(trackName)
+		mp3.SetAlbum(album.Title)
+		mp3.SetArtist(album.Artist.Name)
+		mp3.SetYear(album.Released)
+		mp3.SetGenre(album.Genres.Data[0].Name)
+
+		mp3.Save()
+	}
+
+	return nil
 }
 
 func showUsage() {
