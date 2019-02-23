@@ -40,7 +40,7 @@ func formatAlbumData(album *deezerAlbum) {
 }
 
 // Write meta-data to an mp3 file
-func writeTagMP3(fileName string, trackNum int, album *deezerAlbum) error {
+func writeTagMP3(fileName string, trackNum int, album *deezerAlbum) {
 	mp3, err := id3v2.Open(fileName, id3v2.Options{
 		Parse: false,
 	})
@@ -48,7 +48,7 @@ func writeTagMP3(fileName string, trackNum int, album *deezerAlbum) error {
 
 	if err != nil {
 		log.Fatal(err)
-		return err
+		os.Exit(1)
 	}
 
 	trackName := album.Tracks.Data[trackNum].Title
@@ -60,8 +60,6 @@ func writeTagMP3(fileName string, trackNum int, album *deezerAlbum) error {
 	mp3.SetGenre(album.Genres.Data[0].Name)
 
 	mp3.Save()
-
-	return nil
 }
 
 // Load scribe config file
@@ -158,7 +156,7 @@ func main() {
 		fileExt  := filepath.Ext(fileName)
 
 		if fileExt == ".mp3" {
-			err = writeTagMP3(fileName, i, album)
+			writeTagMP3(fileName, i, album)
 		} else {
 			log.Fatal(fileExt + " not supported right now.")
 			return
