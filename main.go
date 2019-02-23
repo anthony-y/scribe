@@ -64,10 +64,6 @@ func writeTagMP3(fileName string, trackNum int, album *deezerAlbum) {
 
 // Load scribe config file
 func loadConfig() config {
-	const defaultConfig = `{
-	"album_prefix": ""
-}`
-
 	configFile := "scribe_config.json"
 
 	// If the config file doesn't exist, make one and write a default config to it
@@ -79,7 +75,8 @@ func loadConfig() config {
 		}
 		defer newFile.Close()
 
-		_, err = newFile.Write([]byte(defaultConfig))
+		blankConfig, err := json.Marshal(config{})
+		_, err = newFile.Write(blankConfig)
 		if err != nil {
 			log.Fatal(err)
 			os.Exit(1)
