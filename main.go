@@ -94,8 +94,7 @@ func main() {
 		return
 	}
 
-	config := loadConfig()
-
+	config    := loadConfig()
 	albumName := strings.TrimPrefix(filepath.Base(os.Args[1]), config.AlbumPrefix)
 
 	fmt.Println("\n\tWorking...\n")
@@ -137,9 +136,9 @@ func main() {
 		fileName := filepath.Join(os.Args[1], file.Name())
 		fileExt  := filepath.Ext(fileName)
 
-		if fileExt == ".mp3" {
-			writeTagMP3(fileName, i, album)
-		} else {
+		switch fileExt {
+		case ".mp3": writeTagMP3(fileName, i, album)
+		default:
 			log.Fatal(fileExt + " not supported right now.")
 			return
 		}
