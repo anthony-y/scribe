@@ -99,7 +99,7 @@ func getAlbum(client *http.Client, ID string) (*deezerAlbum, error) {
 		return album, err
 	}
 
-	if err = json.Unmarshal(body, &album); err != nil {
+	if json.Unmarshal(body, &album) != nil {
 		return album, err
 	}
 
