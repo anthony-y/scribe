@@ -47,8 +47,7 @@ func loadConfig() config {
 	}
 
 	var config config
-	err = json.Unmarshal(configText, &config)
-	if err != nil {
+	if json.Unmarshal(configText, &config) != nil {
 		log.Fatal(err)
 		os.Exit(1)
 	}

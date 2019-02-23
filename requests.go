@@ -47,7 +47,6 @@ type deezerAlbum struct {
 func requestDeezerAPI(client *http.Client, path string) ([]byte, error)  {
 	request, err := http.NewRequest("GET", "http://api.deezer.com" + path, nil)
 	if err != nil {
-		
 		return nil, err
 	}
 	request.Header.Set("Content-Type", "application/json")
@@ -76,8 +75,7 @@ func searchAlbum(client *http.Client, name string) (int, error) {
 	}
 
 	var search deezerAlbumSearchResult
-	err = json.Unmarshal(body, &search)
-	if err != nil {
+	if err = json.Unmarshal(body, &search); err != nil {
 		return -1, err
 	}
 
@@ -101,8 +99,7 @@ func getAlbum(client *http.Client, ID string) (*deezerAlbum, error) {
 		return album, err
 	}
 
-	err = json.Unmarshal(body, &album)
-	if err != nil {
+	if err = json.Unmarshal(body, &album); err != nil {
 		return album, err
 	}
 
