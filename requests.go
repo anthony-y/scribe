@@ -75,7 +75,7 @@ func searchAlbum(client *http.Client, name string) (int, error) {
 	}
 
 	var search deezerAlbumSearchResult
-	if err = json.Unmarshal(body, &search); err != nil {
+	if json.Unmarshal(body, &search) != nil {
 		return -1, err
 	}
 
