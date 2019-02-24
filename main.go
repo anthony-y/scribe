@@ -103,7 +103,9 @@ func main() {
 
 	fmt.Println("\n\tWorking...\n")
 
-	tagAlbum(os.Args[1])
+	for _, arg := range os.Args[1:] {
+		tagAlbum(arg)
+	}
 }
 
 func showUsage() {
@@ -112,7 +114,7 @@ func showUsage() {
 	fmt.Println("'scribe' gets and applies meta-data from Deezer to MP3 files.")
 
 	fmt.Println("\nUsage:")
-	fmt.Println("\tscribe.exe [path to album]")
+	fmt.Println("\tscribe.exe [path to album][another path]...")
 	fmt.Println("\t(Ensure your folders are named after the albums they contain!)")
 
 	fmt.Println()
