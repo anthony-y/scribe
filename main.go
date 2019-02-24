@@ -10,50 +10,9 @@ import (
 	"strconv"
 	"time"
 	"log"
-	"encoding/json"
 
 	"github.com/bogem/id3v2"
 )
-
-type config struct {
-	AlbumPrefix string `json:"album_prefix"`
-}
-
-// Load scribe config file
-func loadConfig() config {
-	configFile := "scribe_config.json"
-
-	// If the config file doesn't exist, make one and write a default config to it
-	if _, err := os.Stat(configFile); os.IsNotExist(err) {
-		newFile, err := os.Create(configFile)
-		if err != nil {
-			log.Fatal(err)
-			os.Exit(1)
-		}
-		defer newFile.Close()
-
-		blankConfig, err := json.Marshal(config{})
-		_, err = newFile.Write(blankConfig)
-		if err != nil {
-			log.Fatal(err)
-			os.Exit(1)
-		}
-	}
-
-	configText, err := ioutil.ReadFile(configFile)
-	if err != nil {
-		log.Fatal("Failed to load config file: ", err)
-		os.Exit(1)
-	}
-
-	var config config
-	if json.Unmarshal(configText, &config) != nil {
-		log.Fatal(err)
-		os.Exit(1)
-	}
-
-	return config
-}
 
 func formatAlbumData(album *deezerAlbum) {
 	// Change to release year instead of release date
@@ -86,17 +45,9 @@ func writeTagMP3(fileName string, trackNum int, album *deezerAlbum) {
 	mp3.Save()
 }
 
-func main() {
-	// Check args and show usage
-	if len(os.Args) < 2 {
-		showUsage()
-		return
-	}
-
-	config    := loadConfig()
-	albumName := strings.TrimPrefix(filepath.Base(os.Args[1]), config.AlbumPrefix)
-
-	fmt.Println("\n\tWorking...\n")
+// Get meta-data and tag an individual album
+func tagAlbum(path string) {
+	albumName := filepath.Base(path)
 
 	client := &http.Client{
 		Timeout: 20 * time.Second,
@@ -105,13 +56,11 @@ func main() {
 	albumID, err := searchAlbum(client, albumName)
 	if err != nil {
 		log.Fatal(err)
-		return
 	}
 
 	album, err := getAlbum(client, strconv.Itoa(albumID))
 	if err != nil {
 		log.Fatal(err)
-		return
 	}
 
 	formatAlbumData(album)
@@ -119,12 +68,10 @@ func main() {
 	albumDir, err := ioutil.ReadDir(os.Args[1])
 	if err != nil {
 		log.Fatal(err)
-		return
 	}
 
 	if len(albumDir) != len(album.Tracks.Data) {
 		log.Fatal("No Deezer results for " + albumName)
-		return
 	}
 
 	for i, file := range albumDir {
@@ -139,13 +86,24 @@ func main() {
 		case ".mp3": writeTagMP3(fileName, i, album)
 		default:
 			log.Fatal(fileExt + " not supported right now.")
-			return
 		}
 
 		if err != nil {
 			return
 		}
 	}
+}
+
+func main() {
+	// Check args and show usage
+	if len(os.Args) < 2 {
+		showUsage()
+		return
+	}
+
+	fmt.Println("\n\tWorking...\n")
+
+	tagAlbum(os.Args[1])
 }
 
 func showUsage() {
