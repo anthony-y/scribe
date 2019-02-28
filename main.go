@@ -1,15 +1,15 @@
 package main
 
 import (
-	"strings"
-	"net/http"
-	"path/filepath"
-	"io/ioutil"
-	"os"
 	"fmt"
-	"strconv"
-	"time"
+	"io/ioutil"
 	"log"
+	"net/http"
+	"os"
+	"path/filepath"
+	"strconv"
+	"strings"
+	"time"
 
 	"github.com/bogem/id3v2"
 )
@@ -80,10 +80,11 @@ func tagAlbum(path string) {
 		}
 
 		fileName := filepath.Join(os.Args[1], file.Name())
-		fileExt  := filepath.Ext(fileName)
+		fileExt := filepath.Ext(fileName)
 
 		switch fileExt {
-		case ".mp3": writeTagMP3(fileName, i, album)
+		case ".mp3":
+			writeTagMP3(fileName, i, album)
 		default:
 			log.Fatal(fileExt + " not supported right now.")
 		}
